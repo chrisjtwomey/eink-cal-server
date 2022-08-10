@@ -1,2 +1,2 @@
-# eink-cal-esp32
-E-Ink Calendar made for ESP32
+# E-Paper Calendar Service
+Service for serving generated calendar images for ESP32

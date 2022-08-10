@@ -1,19 +1,20 @@
 {
-    "displayTZ": "Europe/Dublin",
+    "weather": {
+        "apikey": "XXXX",
+        "location": "Cork,Ireland"
+    },
+    "timezone": "Europe/Dublin",
     "thresholdHours": 24,
     "maxEventsPerDay": 3,
-    "weekStartDay": 0,
-    "dayOfWeekText": ["M", "T", "W", "T", "F", "S", "S"],
-    "screenWidth": 1304,
-    "screenHeight": 984,
-    "imageWidth": 984,
-    "imageHeight": 1304,
+    "weekStartDay": "Monday",
+    "imageWidth": 480,
+    "imageHeight": 800,
     "rotateAngle": 270,
     "is24h": true,
     "calendars": [
-      "primary"
+        "primary"
     ],
-    "useServer": true,
-    "maxWaitServerMinutes": 10
-  }
-  
+    "useServer": false,
+    "maxWaitServerMinutes": 60
+}
+
