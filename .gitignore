@@ -87,3 +87,6 @@ workspace.code-workspace
 *.html
 *.png
 *.bmp
+
+# mac junk
+.DS_Store

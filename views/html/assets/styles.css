@@ -75,7 +75,7 @@ body {
     padding: 0!important;
     margin: 0!important;
     max-width: 984px;
-    height: 1304px;
+    /*height: 1304px;*/
 }
 *, ::after, ::before {
     box-sizing: border-box;
@@ -100,7 +100,7 @@ Calendar Styling */
 }
 
 .month-name {
-  font-size: 8rem;
+  font-size: 4rem;
   font-family: "Quattrocento-Regular";
 }
 
@@ -152,13 +152,13 @@ Calendar Styling */
 
 .datecircle {
     margin: 0rem auto;
-    width:8rem;
-    height:8rem;
-    font-size: 6rem;
-    border-radius:4rem;
+    width:6rem;
+    height:6rem;
+    font-size: 4rem;
+    border-radius:3rem;
     font-family: "Quattrocento-Regular";
     color:white;
-    line-height: 8rem;
+    line-height: 6rem;
     text-align:center;
     vertical-align: middle;
     background:#ff0000;
@@ -250,6 +250,27 @@ div.batt_container .battery0 {
 
 div.batt_container .batteryHide {
     display: none;
+}
+
+table.forecasts {
+  width: 90%;
+}
+
+.fc-hours {
+}
+
+.fc-hour {
+  width: 25%;
+  text-align: center;
+  font-size: 2rem;
+  font-weight: bold;
+  font-family: "Quattrocento-Regular";
+}
+
+.fc-icon {
+  width: 75%;
+  text-align: center;
+  margin: 0 auto;
 }
 
 /*

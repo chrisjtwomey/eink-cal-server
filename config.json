@@ -14,7 +14,7 @@
     "calendars": [
         "primary"
     ],
-    "useServer": false,
+    "useServer": true,
     "maxWaitServerMinutes": 60
 }
 

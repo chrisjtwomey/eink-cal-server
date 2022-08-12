@@ -21,7 +21,7 @@ class WeatherService:
         data = res.json()
 
         code = data["cod"]
-        if int(code) is not 200:
+        if int(code) != 200:
             raise ValueError("Non-200 response from weather api: {}".format(data))
 
         forecasts = {
@@ -38,9 +38,9 @@ class WeatherService:
                         entry["weather"][0]["icon"]
                     ),
                     "temp": {
-                        "unit": "u'\N{DEGREE SIGN}'C"
+                        "unit": "\N{DEGREE SIGN}C"
                         if self.units == "metric"
-                        else "u'\N{DEGREE SIGN}'F",
+                        else "\N{DEGREE SIGN}F",
                         "high": round(entry["main"]["temp_max"]),
                         "low": round(entry["main"]["temp_min"]),
                         "real": round(entry["main"]["temp"]),

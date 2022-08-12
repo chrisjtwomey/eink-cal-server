@@ -73,29 +73,46 @@ class Homepage:
                             _t=now_date.strftime("%B"),
                         )
                 if weather_service is not None:
-                    forecasts = weather_service.three_hour_daily_forecast()
-                    print(forecasts)
+                    weather = weather_service.three_hour_daily_forecast()
+                    with a.table(klass="forecasts"):
+                        with a.th(klass="fc-hours"):
+                            with a.tr():
+                                for forecast in weather["forecasts"]:
+                                    a.td(klass="fc-hour", _t=forecast["dt"].strftime("%H"))
+
+                        with a.tbody(klass="fc-forecasts"):
+                            with a.tr():
+                                for forecast in weather["forecasts"]:
+                                    with a.td(klass="fc-fc"):
+                                        a.img(klass="fc-icon", src=forecast["icon"])
+
+                        # for forecast in weather["forecasts"]:
+                        #     with a.li(klass="forecast"):
+                        #         a.img(klass="fc-icon", src=forecast[])
 
     def save(self):
+        cwd = os.path.dirname(os.path.realpath(__file__))
         html_fp = os.path.join("views", "html", self.name + ".html")
+        abs_html_fp = "file://" + os.path.join(cwd, "html", self.name + ".html")
         png_fp = os.path.join("views", "png", self.name + ".png")
         bmp_fp = os.path.join("views", "bmp", self.name + ".bmp")
 
         with open(html_fp, "wb") as f:
             f.write(bytes(self.airium))
+            f.close()
 
-        # driver = self._get_chromedriver()
-        # driver.get("file://" + html_fp)
-        # sleep(1)
-        # driver.get_screenshot_as_file(png_fp)
-        # driver.quit()
+        driver = self._get_chromedriver()
+        driver.get(abs_html_fp)
+        sleep(1)
+        driver.get_screenshot_as_file(png_fp)
+        driver.quit()
 
-        # # convert to bmp
-        # img = Image.open(png_fp)
-        # img = img.convert("P", palette=Image.ADAPTIVE, colors=256)
-        # # img = img.rotate(self.rotate_angle, expand=True)
-        # # reduce filesize as much as possible
-        # img.save(bmp_fp, format="bmp", optimize=True, quality=1)
+        # convert to bmp
+        img = Image.open(png_fp)
+        img = img.convert("P", palette=Image.ADAPTIVE, colors=256)
+        # img = img.rotate(self.rotate_angle, expand=True)
+        # reduce filesize as much as possible
+        img.save(bmp_fp, format="bmp", optimize=True, quality=5)
 
         self.log.info("Screenshot captured and saved to file.")
 
