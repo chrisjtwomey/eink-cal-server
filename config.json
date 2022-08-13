@@ -14,7 +14,8 @@
     "calendars": [
         "primary"
     ],
-    "useServer": true,
+    "clientUserAgent": "esp32s3",
+    "useServer": false,
     "maxWaitServerMinutes": 60
 }
 

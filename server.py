@@ -9,7 +9,7 @@ import time
 import threading
 import datetime as dt
 import logging.config
-from flask import Flask, send_file, request
+from flask import Flask, send_file, request, abort
 from werkzeug.serving import make_server
 from pytz import timezone
 from views.homepage import Homepage
@@ -17,6 +17,7 @@ from weather.weather import WeatherService
 
 app = Flask(__name__)
 has_served = False
+client_user_agent = None
 
 cwd = os.path.dirname(os.path.realpath(__file__))
 
@@ -26,11 +27,12 @@ log = logging.getLogger("server")
 
 
 class ServerThread(threading.Thread):
-    def __init__(self, app):
+    def __init__(self, app, user_agent):
         threading.Thread.__init__(self)
         self.server = make_server("0.0.0.0", 8080, app)
         self.ctx = app.app_context()
         self.ctx.push()
+        self.serve_user_agent = user_agent
         self.has_served = False
 
     def run(self):
@@ -42,19 +44,27 @@ class ServerThread(threading.Thread):
         self.server.shutdown()
 
 
-@app.route("/calendar")
+@app.route("/homepage.bmp")
 def serve_cal_png():
-    global has_served
+    global has_served, client_user_agent
     """
     Returns the calendar image directly through send_file
     """
-    client = request.args.get("client")
-    if client is not None and client == "esp32":
+    user_agent = request.headers.get("User-Agent")
+    if user_agent is not None and user_agent == client_user_agent:
         has_served = True
-    f = open(os.path.join(cwd, "render/calendar.bmp"), "rb")
+
+    bmp_path = os.path.join(cwd, "views/bmp/homepage.bmp")
+
+    if not os.path.exists(bmp_path):
+        log.error(f"{bmp_path}: no such file exists")
+        abort(404)
+
+    f = open(bmp_path, "rb")
     stream = io.BytesIO(f.read())
+
     return send_file(
-        stream, mimetype="image/bmp", as_attachment=True, download_name="calendar.bmp"
+        stream, mimetype="image/bmp", as_attachment=True, download_name=f"homepage.bmp"
     )
 
 
@@ -66,20 +76,13 @@ def main():
     displayTZ = timezone(
         config["timezone"]
     )  # list of timezones - print(pytz.all_timezones)
-    thresholdHours = config[
-        "thresholdHours"
-    ]  # considers events updated within last 12 hours as recently updated
-    maxEventsPerDay = config[
-        "maxEventsPerDay"
-    ]  # limits number of events to display (remainder displayed as '+X more')
     weekStartDay = config["weekStartDay"]  # Monday = 0, Sunday = 6
     imageWidth = config["imageWidth"]  # Width of image to be generated for display.
     imageHeight = config["imageHeight"]  # Height of image to be generated for display.
     rotateAngle = config[
         "rotateAngle"
     ]  # If image is rendered in portrait orientation, angle to rotate to fit screen
-    calendars = config["calendars"]  # Google calendar ids
-    is24hour = config["is24h"]  # set 24 hour time
+    client_user_agent = config["clientUserAgent"]
     use_server = config["useServer"]
     max_wait_serve_seconds = config["maxWaitServerMinutes"] * 60
 
@@ -93,7 +96,7 @@ def main():
     try:
         homepage = Homepage(imageWidth, imageHeight, rotateAngle)
         homepage.generate(
-            weather_service=weather, week_start_day=weekStartDay, tz=displayTZ
+            weather_service=weather
         )
         homepage.save()
 
@@ -108,7 +111,7 @@ def main():
 
     log.info("Serving calendar image for esp32 client")
 
-    http_server = ServerThread(app)
+    http_server = ServerThread(app, client_user_agent)
     http_server.start()
 
     log.info(
