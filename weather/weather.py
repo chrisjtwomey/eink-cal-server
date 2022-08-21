@@ -1,32 +1,38 @@
+import json
 import requests
 from os.path import exists, abspath
 from datetime import datetime
 
 
 class WeatherService:
-    def __init__(self, apikey, location="Cork,Ireland", metric=True):
+    def __init__(self, apikey, location="Cork,Ireland", metric=True, debug=False):
         self.apikey = apikey
         self.units = "metric" if metric else "imperial"
         self.num_hours = 5
         self.baseurl = "https://api.openweathermap.org"
+        self.debug = debug
 
         self.lat, self.lon = self.get_coords(location)
 
     def get_icon(self, icon_id):
-        local_path = "views/html/assets/{}@4x.png".format(icon_id)
+        local_path = f"views/html/assets/{icon_id}.png"
         if not exists(local_path):
-            return "https://openweathermap.org/img/wn/{}@4x.png".format(icon_id)
+            return f"https://openweathermap.org/img/wnicon_id4x.png"
 
         return abspath(local_path)
 
     def current_forecast(self):
-        res = requests.get(
-            self.baseurl
-            + "/data/2.5/weather?lat={}&lon={}&appid={}&units={}".format(
-                self.lat, self.lon, self.apikey, self.units
+        if self.debug:
+            with open("weather/debug-current.json") as f:
+                data = json.load(f)
+        else:
+            res = requests.get(
+                self.baseurl
+                + "/data/2.5/weather?lat={}&lon={}&appid={}&units={}".format(
+                    self.lat, self.lon, self.apikey, self.units
+                )
             )
-        )
-        data = res.json()
+            data = res.json()
 
         forecast = {
             "dt": datetime.fromtimestamp(data["dt"]),
@@ -44,7 +50,7 @@ class WeatherService:
             },
             "wind": {
                 "unit": "kmh" if self.units == "metric" else "mph",
-                "real": data["wind"]["speed"],
+                "real": round(data["wind"]["speed"]),
             },
             "humidity_percentage": data["main"]["humidity"],
             "pressure_hpa": data["main"]["pressure"],
@@ -55,13 +61,17 @@ class WeatherService:
         return forecast
 
     def three_hour_daily_forecast(self):
-        res = requests.get(
-            self.baseurl
-            + "/data/2.5/forecast?cnt={}&lat={}&lon={}&appid={}&units={}".format(
-                self.num_hours, self.lat, self.lon, self.apikey, self.units
+        if self.debug:
+            with open("weather/debug-hourly.json") as f:
+                data = json.load(f)
+        else:
+            res = requests.get(
+                self.baseurl
+                + "/data/2.5/forecast?cnt={}&lat={}&lon={}&appid={}&units={}".format(
+                    self.num_hours, self.lat, self.lon, self.apikey, self.units
+                )
             )
-        )
-        data = res.json()
+            data = res.json()
 
         code = data["cod"]
         if int(code) != 200:

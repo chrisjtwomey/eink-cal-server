@@ -1,52 +1,24 @@
-/*
-*
-* ==========================================
-* CUSTOM UTIL CLASSES
-* ==========================================
-*
-*/
-.clearfix::after,
+@font-face {
+  font-family: "Quattrocento-Bold";
+  src: url('Quattrocento-Bold.ttf');
+}
 
-:root {
-    --red: #dc3545;
-    --white: #fff;
-    --gray: #6c757d;
-    --gray-dark: #343a40;
+@font-face {
+  font-family: "Quattrocento-Regular";
+  src: url('Quattrocento-Regular.ttf');
 }
 
 .text-uppercase {
-    text-transform: uppercase!important;
-}
-
-.mb-0, .my-0 {
-    margin-top: 0;
-    margin-bottom: 0!important;
-}
-
-.p-3 {
-    padding: 1rem!important;
+  text-transform: uppercase!important;
 }
 
 .text-center {
-    text-align: center!important;
-}
-
-.list-unstyled {
-    padding-left: 0;
-    list-style: none;
-}
-
-.font-weight-bold {
-    font-weight: 700!important;
-}
-
-.text-muted {
-    color: #6c757d!important;
+  text-align: center!important;
 }
 
 body {
+    font-family: "DejaVu Sans";
     margin: 0;
-    font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";
     font-size: 1rem;
     font-weight: 400;
     line-height: 1.5;
@@ -55,103 +27,10 @@ body {
     background-color: #fff;
 }
 
-@font-face {
-    font-family: "Quattrocento-Bold";
-    src: url('Quattrocento-Bold.ttf');
-}
-
-@font-face {
-    font-family: "Quattrocento-Regular";
-    src: url('Quattrocento-Regular.ttf');
-}
-
 .container {
-    width: 100%;
+    max-width: 920px;
     padding: 0!important;
     margin: auto!important;
-}
-
-/* ================
-Calendar Styling */
-.calendar {
-  border-radius: 0px;
-}
-
-.month {
-  font-size: 13rem;
-  font-family: "Quattrocento-Regular";
-}
-
-.month-name {
-  font-size: 8rem;
-  font-family: "Quattrocento-Regular";
-}
-
-@media (min-width: 992px) {
-  .month {
-    font-size: 13rem;
-    line-height: 13rem;
-    font-family: "Quattrocento-Regular";
-  }
-}
-
-.datecirclebox {
-    position: relative;
-}
-
-.datecircle {
-    margin: 2rem auto;
-    width:12rem;
-    height:12rem;
-    font-size: 8rem;
-    border-radius:6rem;
-    font-family: "Quattrocento-Regular";
-    color:white;
-    line-height: 12rem;
-    text-align:center;
-    vertical-align: middle;
-    background:#ff0000;
-}
-
-.calendar .days li .event {
-  font-size: 1rem;
-  /* font-weight: bold;*/
-  padding: 0.1rem;
-  /* color: black; */
-  /* font-family: "Judson-Regular";*/
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  border-radius: 0rem;
-  margin-bottom: 1px;
-}
-
-.calendar .days li .event.span-2 {
-  width: 200%;
-}
-
-.text-multiday {
-  text-overflow: '...」'!important;
-}
-
-.calendar .days li .event.begin {
-  border-radius: 1rem 0 0 1rem;
-}
-
-.calendar .days li .event.end {
-  border-radius: 0 1rem 1rem 0;
-}
-
-.calendar .days li .event.clear {
-  background: none;
-}
-
-.calendar .days li:nth-child(n+29) {
-  border-bottom: none;
-}
-
-.calendar .days li.outside .date {
-  color: #ddd;
 }
 
 div.batt_container {
@@ -201,95 +80,92 @@ div.batt_container .batteryHide {
     display: none;
 }
 
-table.hourly-forecasts {
-  width: 100%;
+.datecirclebox {
+  position: relative;
 }
 
-table.hourly-forecasts td {
-  max-width: 100%;
-
-}
-
-.fc-hour {
-  text-align: center;
-  font-size: 4rem;
+.datecircle {
   font-family: "Quattrocento-Regular";
+  font-size: 18vw;
+  font-weight: 700;
+  line-height: 24vw;
+  vertical-align: middle;
+  color:white;
+  background:#ff0000;
+  margin: 2rem auto;
+  width:24vw;
+  height:24vw;
+  border-radius:12vw;
 }
 
-.fc-temp {
-  text-align: center;
-  font-size: 3rem;
-  font-family: "Quattrocento-Regular";
+.fc-icon-stat div {
+    margin: 0.5vh 0 !important;
+    padding: 0 !important;
 }
 
-img.fc-icon {
-  text-align: center;
+.fc-icon-stat .fc-icon {
+  float: left;
+  width: 45%;
+  padding: 0;
+  margin: 0 auto;
+}
+
+.fc-icon-stat .fc-stat {
+  float: left;
+  width: 55%;
+  font-size: 4.5vw;
+  line-height: 6vh;
+}
+
+.fc-icon img {
   width: 100%;
+  text-align: center;
   margin: auto!important;
 }
 
-.fc-rain-perc {
-  float: left;
-  text-align: right;
-  width: 50%;
-  line-height: 6rem;
-  font-size: 2rem;
+#date-and-month #month {
   font-family: "Quattrocento-Regular";
+  font-size: 10rem;
+  font-weight: 500;
 }
 
-.fc-rain-icon {
-  float: left;
-  width: 40%;
-}
-
-.fc-curr-container {
+#current-weather {
   overflow: hidden;
   padding-bottom: 1rem;
 }
 
-.fc-curr-main {
-  width: 30%;
-  height: 100%;
+#forecast-today-icon {
   float: left;
+  width: 40%;
 }
 
-.fc-curr-stats {
-  width: 70%;
-  float: left;
+#forecast-today-icon .fc-icon {
+  float: none;
+  width: 80%;
 }
 
-.fc-curr-stats-icon {
-  float: left;
-}
-
-.fc-curr-icon {
+#forecast-today-icon .fc-stat {
+  float: none;
   width: 100%;
-}
-
-.fc-curr-stats-icon {
-  width: 50%;
-}
-
-.fc-curr-stats-stat {
-  line-height: 8rem;
-  font-size: 2rem;
-  font-family: "Quattrocento-Regular";
-}
-
-.fc-curr-main-temp {
   text-align: center;
-  font-size: 3rem;
+}
+
+#forecast-today-stat {
+    float: left;
+    width: 60%;
+}
+
+#hourly-forecasts .forecast-hour {
+  text-align: center;
+  font-size: 8vw;
   font-family: "Quattrocento-Regular";
 }
 
-/*
-*
-* ==========================================
-* FOR DEMO PURPOSES
-* ==========================================
-*
-*/
-body {
-  min-height: 100vh;
-  background-color: #ffffff;
+.hourly-forecasts-forecast > tr {
+    padding: 0 1vw;
+}
+
+.hourly-forecast-icon {
+    width: 80%;
+    margin: 0 auto!important;
 }

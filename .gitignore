@@ -85,7 +85,7 @@ workspace.code-workspace
 
 # gen'd files
 *.html
-*.png
+views/png/*.png
 *.bmp
 
 # mac junk

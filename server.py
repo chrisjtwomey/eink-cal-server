@@ -17,7 +17,7 @@ from weather.weather import WeatherService
 
 app = Flask(__name__)
 has_served = False
-client_user_agent = None
+client_user_agent = "tinys3"
 
 cwd = os.path.dirname(os.path.realpath(__file__))
 
@@ -39,8 +39,9 @@ class ServerThread(threading.Thread):
         log.info("starting http server")
         self.server.serve_forever()
 
-    def shutdown(self):
-        log.info("stopping http server")
+    def shutdown(self, timeout=60):
+        log.info(f"stopping http server in {timeout} seconds")
+        time.sleep(timeout)
         self.server.shutdown()
 
 
@@ -89,7 +90,7 @@ def main():
     apikey = config["weather"]["apikey"]
     location = config["weather"]["location"]
 
-    weather = WeatherService(apikey, location)
+    weather = WeatherService(apikey, location, debug=False)
 
     log.info("Starting daily calendar update")
 
@@ -124,7 +125,7 @@ def main():
     while not has_served and diff.seconds < max_wait_serve_seconds:
         time.sleep(1)
         diff = dt.datetime.now(displayTZ) - start_wait_dt
-    http_server.shutdown()
+    http_server.shutdown(timeout=120)
 
     if not has_served:
         log.error("Timeout waiting to server esp32 client, exiting")
