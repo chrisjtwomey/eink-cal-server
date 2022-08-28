@@ -137,17 +137,28 @@ div.batt_container .batteryHide {
 #forecast-today-icon {
   float: left;
   width: 40%;
+  position: relative;
 }
 
 #forecast-today-icon .fc-icon {
   float: none;
-  width: 80%;
+  width: 90%;
 }
 
 #forecast-today-icon .fc-stat {
-  float: none;
+  position: absolute;
+  bottom: -1vh;
   width: 100%;
   text-align: center;
+}
+
+#forecast-today-icon > div.fc-icon > img {
+  width: 100%;
+  margin: 0 auto !important;
+}
+
+#forecast-today-icon .fc-stat p {
+  margin: 0;
 }
 
 #forecast-today-stat {
