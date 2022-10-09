@@ -1,21 +1,21 @@
 {
     "weather": {
-        "apikey": "XXXX",
+        "apikey": "94bb2c5af812715a7fa1220bdf0f2ab3",
         "location": "Cork,Ireland"
     },
     "timezone": "Europe/Dublin",
     "thresholdHours": 24,
     "maxEventsPerDay": 3,
     "weekStartDay": "Monday",
-    "imageWidth": 480,
-    "imageHeight": 800,
+    "imageWidth": 825,
+    "imageHeight": 1200,
     "rotateAngle": 270,
     "is24h": true,
     "calendars": [
         "primary"
     ],
     "clientUserAgent": "esp32s3",
-    "useServer": false,
+    "useServer": true,
     "maxWaitServerMinutes": 60
 }
 

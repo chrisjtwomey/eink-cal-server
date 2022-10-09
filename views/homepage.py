@@ -161,6 +161,7 @@ class Homepage:
         w, h = img.size
         img.thumbnail((w // 2, h // 2), Image.ANTIALIAS)
         # reduce filesize as much as possible
+        img.save(png_fp, format="png", optimize=True, quality=5)
         img.save(bmp_fp, format="bmp", optimize=True, quality=5)
 
         self.log.info("Screenshot captured and saved to file.")

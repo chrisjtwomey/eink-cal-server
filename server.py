@@ -46,7 +46,7 @@ class ServerThread(threading.Thread):
 
 
 @app.route("/homepage.bmp")
-def serve_cal_png():
+def serve_cal_bmp():
     global has_served, client_user_agent
     """
     Returns the calendar image directly through send_file
@@ -66,6 +66,29 @@ def serve_cal_png():
 
     return send_file(
         stream, mimetype="image/bmp", as_attachment=True, download_name=f"homepage.bmp"
+    )
+
+@app.route("/homepage.png")
+def serve_cal_png():
+    global has_served, client_user_agent
+    """
+    Returns the calendar image directly through send_file
+    """
+    user_agent = request.headers.get("User-Agent")
+    if user_agent is not None and user_agent == client_user_agent:
+        has_served = True
+
+    png_path = os.path.join(cwd, "views/png/homepage.png")
+
+    if not os.path.exists(png_path):
+        log.error(f"{png_path}: no such file exists")
+        abort(404)
+
+    f = open(png_path, "rb")
+    stream = io.BytesIO(f.read())
+
+    return send_file(
+        stream, mimetype="image/png", as_attachment=True, download_name=f"homepage.png"
     )
 
 

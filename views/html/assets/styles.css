@@ -28,7 +28,7 @@ body {
 }
 
 .container {
-    max-width: 920px;
+    max-width: 2400px;
     padding: 0!important;
     margin: auto!important;
 }
@@ -91,7 +91,7 @@ div.batt_container .batteryHide {
   line-height: 24vw;
   vertical-align: middle;
   color:white;
-  background:#ff0000;
+  background:#000000;
   margin: 2rem auto;
   width:24vw;
   height:24vw;
