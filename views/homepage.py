@@ -50,11 +50,12 @@ class Homepage:
                 with a.div(id="date-and-month", klass="container"):
                     with a.div():
                         a.h3(
-                            klass="datecircle text-center",
+                            id="datecircle",
+                            klass="text-center",
                             _t=now_date.day,
                         )
 
-                        a.h4(
+                        a.h3(
                             id="month",
                             klass="month text-center text-uppercase",
                             _t=now_date.strftime("%B"),

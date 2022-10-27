@@ -8,6 +8,16 @@
   src: url('Quattrocento-Regular.ttf');
 }
 
+@font-face {
+  font-family: "Merienda-Bold";
+  src: url('Merienda-Bold.ttf');
+}
+
+@font-face {
+  font-family: "Merienda-Regular";
+  src: url('Merienda-Regular.ttf');
+}
+
 .text-uppercase {
   text-transform: uppercase!important;
 }
@@ -17,12 +27,11 @@
 }
 
 body {
-    font-family: "DejaVu Sans";
+    font-family: "Merienda-Regular";
     margin: 0;
-    font-size: 1rem;
     font-weight: 400;
     line-height: 1.5;
-    color: #212529;
+    color: #000000;
     text-align: left;
     background-color: #fff;
 }
@@ -80,22 +89,24 @@ div.batt_container .batteryHide {
     display: none;
 }
 
-.datecirclebox {
-  position: relative;
-}
-
-.datecircle {
-  font-family: "Quattrocento-Regular";
+#datecircle {
+  float: left;
+  font-family: "Merienda-Regular";
   font-size: 18vw;
   font-weight: 700;
   line-height: 24vw;
   vertical-align: middle;
   color:white;
   background:#000000;
-  margin: 2rem auto;
+  margin: 2rem;
   width:24vw;
   height:24vw;
   border-radius:12vw;
+}
+
+.fc-icon-stat {
+  display: flex;
+  align-items: center;
 }
 
 .fc-icon-stat div {
@@ -105,7 +116,7 @@ div.batt_container .batteryHide {
 
 .fc-icon-stat .fc-icon {
   float: left;
-  width: 45%;
+  width: 35%;
   padding: 0;
   margin: 0 auto;
 }
@@ -117,16 +128,29 @@ div.batt_container .batteryHide {
   line-height: 6vh;
 }
 
+.fc-icon-stat .fc-stat p {
+  padding-left: 1vw;
+}
+
 .fc-icon img {
   width: 100%;
   text-align: center;
   margin: auto!important;
 }
 
+#date-and-month div {
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+}
+
 #date-and-month #month {
-  font-family: "Quattrocento-Regular";
-  font-size: 10rem;
-  font-weight: 500;
+  float: left;
+  margin: auto 0;
+  height: 100%;
+  vertical-align: middle;
+  font-family: "Merienda-Regular";
+  font-size: 14rem;
 }
 
 #current-weather {
@@ -147,7 +171,8 @@ div.batt_container .batteryHide {
 
 #forecast-today-icon .fc-stat {
   position: absolute;
-  bottom: -1vh;
+  right: -4vh;
+  bottom: 2vh;
   width: 100%;
   text-align: center;
 }
@@ -169,7 +194,7 @@ div.batt_container .batteryHide {
 #hourly-forecasts .forecast-hour {
   text-align: center;
   font-size: 8vw;
-  font-family: "Quattrocento-Regular";
+  font-family: "Merienda-Regular";
 }
 
 .hourly-forecasts-forecast > tr {
