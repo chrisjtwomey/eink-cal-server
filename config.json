@@ -1,6 +1,6 @@
 {
     "weather": {
-        "apikey": "94bb2c5af812715a7fa1220bdf0f2ab3",
+        "apikey": "XXXX",
         "location": "Cork,Ireland"
     },
     "timezone": "Europe/Dublin",
@@ -11,11 +11,15 @@
     "imageHeight": 1200,
     "rotateAngle": 270,
     "is24h": true,
-    "calendars": [
-        "primary"
-    ],
-    "clientUserAgent": "esp32s3",
     "useServer": true,
+    "clientUserAgent": "inkplate",
+    "useUserAgent": false,
+    "mqtt": {
+        "enabled": true,
+        "host": "localhost",
+        "port": 1883,
+        "topic": "mqtt/eink-cal-client"
+    },
     "maxWaitServerMinutes": 60
 }
 

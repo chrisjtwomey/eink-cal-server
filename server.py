@@ -9,6 +9,7 @@ import time
 import threading
 import datetime as dt
 import logging.config
+import paho.mqtt.client as mqtt
 from flask import Flask, send_file, request, abort
 from werkzeug.serving import make_server
 from pytz import timezone
@@ -18,6 +19,7 @@ from weather.weather import WeatherService
 app = Flask(__name__)
 has_served = False
 client_user_agent = "tinys3"
+use_user_agent = False
 
 cwd = os.path.dirname(os.path.realpath(__file__))
 
@@ -70,7 +72,7 @@ def serve_cal_bmp():
 
 @app.route("/homepage.png")
 def serve_cal_png():
-    global has_served, client_user_agent
+    global has_served, client_user_agent, use_user_agent
     """
     Returns the calendar image directly through send_file
     """
@@ -87,6 +89,8 @@ def serve_cal_png():
     f = open(png_path, "rb")
     stream = io.BytesIO(f.read())
 
+    has_served = True
+
     return send_file(
         stream, mimetype="image/png", as_attachment=True, download_name=f"homepage.png"
     )
@@ -101,12 +105,13 @@ def main():
         config["timezone"]
     )  # list of timezones - print(pytz.all_timezones)
     weekStartDay = config["weekStartDay"]  # Monday = 0, Sunday = 6
-    imageWidth = config["imageWidth"]  # Width of image to be generated for display.
-    imageHeight = config["imageHeight"]  # Height of image to be generated for display.
+    imageWidth = config["imageWidth"] 
+    imageHeight = config["imageHeight"]
     rotateAngle = config[
         "rotateAngle"
     ]  # If image is rendered in portrait orientation, angle to rotate to fit screen
     client_user_agent = config["clientUserAgent"]
+    use_user_agent = config["useUserAgent"]
     use_server = config["useServer"]
     max_wait_serve_seconds = config["maxWaitServerMinutes"] * 60
 
@@ -133,6 +138,39 @@ def main():
     if not use_server:
         sys.exit(0)
 
+    mqtt_client = mqtt.Client("eink-cal-server")
+    def on_connect(client, userdata, flags, rc):
+        if rc != 0:
+            log.error("Connection calendar client logging broker failed")
+        
+        log.info("Connected to calendar client logging broker")
+
+    def on_disconnect(client, userdata, rc):
+        if rc != 0:
+            log.error("Unexpected broker disconnection")
+
+        log.info("Disconnected from calendar client logging broker")
+
+    def on_message(client, userdata, message):
+        with open('client-mqtt.log','a+') as f:
+            msg = "{}\n".format(message.payload.decode())
+            f.write(msg)
+
+    mqtt_client.on_connect=on_connect
+    mqtt_client.on_disconnect=on_disconnect
+    mqtt_client.on_message=on_message
+    try:
+        mqtt_client.connect(
+            config["mqtt"]["host"], 
+            config["mqtt"]["port"], 
+            60
+        )
+    except Exception as e:
+        log.error(e)
+        
+    mqtt_client.subscribe(config["mqtt"]["topic"])
+    mqtt_client.loop_start()
+
     log.info("Serving calendar image for esp32 client")
 
     http_server = ServerThread(app, client_user_agent)
@@ -153,6 +191,9 @@ def main():
     if not has_served:
         log.error("Timeout waiting to server esp32 client, exiting")
         sys.exit(1)
+
+    mqtt_client.loop_stop()
+    mqtt_client.disconnect()
 
     log.info("Served esp32 client, shutting down")
     sys.exit(0)
