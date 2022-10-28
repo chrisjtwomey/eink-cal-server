@@ -152,9 +152,7 @@ def main():
         log.info("Disconnected from calendar client logging broker")
 
     def on_message(client, userdata, message):
-        with open('client-mqtt.log','a+') as f:
-            msg = "{}\n".format(message.payload.decode())
-            f.write(msg)
+        log.info("Cal client: {}".format(message.payload.decode()))
 
     mqtt_client.on_connect=on_connect
     mqtt_client.on_disconnect=on_disconnect
