@@ -137,6 +137,7 @@ def main():
     if not use_server:
         sys.exit(0)
 
+    # set up listener for client logs
     mqtt_client = mqtt.Client("eink-cal-server")
     def on_connect(client, userdata, flags, rc):
         if rc != 0:
@@ -152,6 +153,10 @@ def main():
 
     clientLog = logging.getLogger("client")
     def on_message(client, userdata, message):
+        if message.retain:
+            # ignore stale messages
+            return
+            
         clientLog.info(message.payload.decode())
 
     mqtt_client.on_connect=on_connect
