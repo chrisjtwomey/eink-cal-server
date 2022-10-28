@@ -184,7 +184,7 @@ def main():
     while not has_served and diff.seconds < max_wait_serve_seconds:
         time.sleep(1)
         diff = dt.datetime.now(displayTZ) - start_wait_dt
-    http_server.shutdown(timeout=120)
+    http_server.shutdown(timeout=10)
 
     if not has_served:
         log.error("Timeout waiting to server esp32 client, exiting")

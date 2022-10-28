@@ -20,6 +20,6 @@
         "port": 1883,
         "topic": "mqtt/eink-cal-client"
     },
-    "maxWaitServerMinutes": 60
+    "maxWaitServerMinutes": 5
 }
 
