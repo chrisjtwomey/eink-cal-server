@@ -27,7 +27,6 @@ cwd = os.path.dirname(os.path.realpath(__file__))
 logging.config.fileConfig(os.path.join(cwd, "logging.dev.ini"))
 log = logging.getLogger("server")
 
-
 class ServerThread(threading.Thread):
     def __init__(self, app, user_agent):
         threading.Thread.__init__(self)
@@ -151,8 +150,9 @@ def main():
 
         log.info("Disconnected from calendar client logging broker")
 
+    clientLog = logging.getLogger("client")
     def on_message(client, userdata, message):
-        log.info("Cal client: {}".format(message.payload.decode()))
+        clientLog.info(message.payload.decode())
 
     mqtt_client.on_connect=on_connect
     mqtt_client.on_disconnect=on_disconnect
