@@ -15,6 +15,7 @@ from werkzeug.serving import make_server
 from pytz import timezone
 from views.homepage import Homepage
 from weather.weather import WeatherService
+from google_api.staticmap import StaticMapService
 
 app = Flask(__name__)
 has_served = False
@@ -96,35 +97,44 @@ def serve_cal_png():
 
 
 def main():
-    # Basic configuration settings (user replaceable)
     configFile = open(os.path.join(cwd, "config.json"))
     config = json.load(configFile)
 
     displayTZ = timezone(
         config["timezone"]
-    )  # list of timezones - print(pytz.all_timezones)
-    weekStartDay = config["weekStartDay"]  # Monday = 0, Sunday = 6
+    ) 
     imageWidth = config["imageWidth"] 
     imageHeight = config["imageHeight"]
-    rotateAngle = config[
-        "rotateAngle"
-    ]  # If image is rendered in portrait orientation, angle to rotate to fit screen
     client_user_agent = config["clientUserAgent"]
     use_user_agent = config["useUserAgent"]
     use_server = config["useServer"]
     max_wait_serve_seconds = config["maxWaitServerMinutes"] * 60
 
-    apikey = config["weather"]["apikey"]
-    location = config["weather"]["location"]
+    location = config["location"].strip().replace(" ", "")
+    weather_apikey = config["weather"]["apikey"]
 
-    weather = WeatherService(apikey, location, debug=False)
+    weather_svc = WeatherService(
+        weather_apikey, 
+        location, 
+        debug=False,
+    )
+
+    maps_apikey = config["maps"]["apikey"]
+    maps_mapid = config["maps"]["map_id"]
+
+    map_svc = StaticMapService(
+        maps_apikey,
+        maps_mapid,
+    )
 
     log.info("Starting daily calendar update")
 
     try:
-        homepage = Homepage(imageWidth, imageHeight, rotateAngle)
+        homepage = Homepage(imageWidth, imageHeight)
         homepage.generate(
-            weather_service=weather
+            weather_svc,
+            map_svc,
+            location
         )
         homepage.save()
 

@@ -1,14 +1,4 @@
 @font-face {
-  font-family: "Quattrocento-Bold";
-  src: url('Quattrocento-Bold.ttf');
-}
-
-@font-face {
-  font-family: "Quattrocento-Regular";
-  src: url('Quattrocento-Regular.ttf');
-}
-
-@font-face {
   font-family: "Merienda-Bold";
   src: url('Merienda-Bold.ttf');
 }
@@ -19,89 +9,94 @@
 }
 
 .text-uppercase {
-  text-transform: uppercase!important;
+  text-transform: uppercase !important;
 }
 
 .text-center {
-  text-align: center!important;
+  text-align: center !important;
 }
 
 body {
-    font-family: "Merienda-Regular";
-    margin: 0;
-    font-weight: 400;
-    line-height: 1.5;
-    color: #000000;
-    text-align: left;
-    background-color: #fff;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  font-family: "Merienda-Regular";
+  font-weight: 400;
+  line-height: 1.5;
+  text-align: left;
+  color: #000;
+  background-color: #fff;
+}
+
+.bg-container {
+  width: 100%;
+  padding: 0 !important;
+  margin: 0 auto !important;
+  background-color: white;
 }
 
 .container {
-    max-width: 2400px;
-    padding: 0!important;
-    margin: auto!important;
+  width: 95%;
+  padding: 0 !important;
+  margin: 0 auto !important;
 }
 
-div.batt_container {
-  width: 53px;
-  height: 27px;
-  position: absolute;
-  top: 5;
-  left: 925;
-  overflow: hidden;
-}
-
-div.batt_container  {
-  z-index: 10;
-}
-
-div.batt_container .battery80 {
-  position: relative;
-  left: 0px;
-  top: 0px;
-}
-
-div.batt_container .battery60 {
-  position: relative;
-  left: 0px;
-  top: -44px;
-}
-
-div.batt_container .battery40 {
-  position: relative;
-  left: 0px;
-  top: -89px;
-}
-
-div.batt_container .battery20 {
-  position: relative;
-  left: 0px;
-  top: -134px;
-}
-
-div.batt_container .battery0 {
-  position: relative;
-  left: 0px;
-  top: -178px;
-}
-
-div.batt_container .batteryHide {
-    display: none;
-}
-
-#datecircle {
-  float: left;
-  font-family: "Merienda-Regular";
+h3.numcircle {
   font-size: 18vw;
   font-weight: 700;
   line-height: 24vw;
+  width: 24vw;
+  border-radius: 12vw;
+}
+
+h4.numcircle {
+  font-size: 5vw;
+  font-weight: 600;
+  line-height: 14vw;
+  width: 14vw;
+  border-radius: 7vw;
+}
+
+.numcircle {
+  color: white;
+  background: #000000;
+  margin: 1rem;
   vertical-align: middle;
-  color:white;
-  background:#000000;
-  margin: 2rem;
-  width:24vw;
-  height:24vw;
-  border-radius:12vw;
+}
+
+#top-banner {
+  height: 20vh;
+}
+
+#top-banner .numcircle, #top-banner #month {
+  float: left;
+}
+
+#top-banner #temp {
+  position: absolute;
+  top: 20vh;
+  right: 2vw;
+}
+
+#top-banner #month {
+  margin: auto 0;
+  vertical-align: middle;
+  line-height: 20vh;
+  font-size: 10vw;
+}
+
+#map-container {
+  position: relative;
+  overflow: hidden;
+  height: 400px;
+  z-index: -1;
+}
+
+#map {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
 .fc-icon-stat {
@@ -110,8 +105,8 @@ div.batt_container .batteryHide {
 }
 
 .fc-icon-stat div {
-    margin: 0.5vh 0 !important;
-    padding: 0 !important;
+  margin: 0.5vh 0 !important;
+  padding: 0 !important;
 }
 
 .fc-icon-stat .fc-icon {
@@ -125,7 +120,7 @@ div.batt_container .batteryHide {
   float: left;
   width: 55%;
   font-size: 4.5vw;
-  line-height: 6vh;
+  line-height: 3vh;
 }
 
 .fc-icon-stat .fc-stat p {
@@ -135,22 +130,7 @@ div.batt_container .batteryHide {
 .fc-icon img {
   width: 100%;
   text-align: center;
-  margin: auto!important;
-}
-
-#date-and-month div {
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-}
-
-#date-and-month #month {
-  float: left;
-  margin: auto 0;
-  height: 100%;
-  vertical-align: middle;
-  font-family: "Merienda-Regular";
-  font-size: 14rem;
+  margin: auto !important;
 }
 
 #current-weather {
@@ -169,15 +149,7 @@ div.batt_container .batteryHide {
   width: 90%;
 }
 
-#forecast-today-icon .fc-stat {
-  position: absolute;
-  right: -4vh;
-  bottom: 2vh;
-  width: 100%;
-  text-align: center;
-}
-
-#forecast-today-icon > div.fc-icon > img {
+#forecast-today-icon>div.fc-icon>img {
   width: 100%;
   margin: 0 auto !important;
 }
@@ -187,21 +159,27 @@ div.batt_container .batteryHide {
 }
 
 #forecast-today-stat {
-    float: left;
-    width: 60%;
+  float: left;
+  width: 60%;
 }
 
 #hourly-forecasts .forecast-hour {
   text-align: center;
-  font-size: 8vw;
+  font-size: 5vw;
   font-family: "Merienda-Regular";
 }
 
-.hourly-forecasts-forecast > tr {
-    padding: 0 1vw;
+.hourly-forecasts-forecast>tr {
+  padding: 0 1vw;
 }
 
 .hourly-forecast-icon {
-    width: 80%;
-    margin: 0 auto!important;
+  width: 80%;
+  margin: 0 auto !important;
+}
+
+#test {
+  height: 300px;
+  max-width: 100%;
+  margin: 0 auto;
 }

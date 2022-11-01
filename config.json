@@ -1,24 +1,23 @@
 {
-    "weather": {
-        "apikey": "XXXX",
-        "location": "Cork,Ireland"
-    },
-    "timezone": "Europe/Dublin",
-    "thresholdHours": 24,
-    "maxEventsPerDay": 3,
-    "weekStartDay": "Monday",
     "imageWidth": 825,
     "imageHeight": 1200,
-    "rotateAngle": 270,
-    "is24h": true,
-    "useServer": true,
+    "location": "Dublin",
+    "weather": {
+        "apikey": "XXXX"
+    },
+    "maps": {
+        "apikey": "XXXX",
+        "map_id": "c7b3fc621b48a353"
+    },
+    "timezone": "Europe/Dublin",
+    "useServer": false,
     "clientUserAgent": "inkplate",
     "useUserAgent": false,
     "mqtt": {
         "enabled": true,
         "host": "localhost",
         "port": 1883,
-        "topic": "mqtt/eink-cal-client"
+        "topic": "mqtt/eink-cal-client"   
     },
     "maxWaitServerMinutes": 5
 }

@@ -5,7 +5,7 @@ from datetime import datetime
 
 
 class WeatherService:
-    def __init__(self, apikey, location="Cork,Ireland", metric=True, debug=False):
+    def __init__(self, apikey, location, metric=True, debug=False):
         self.apikey = apikey
         self.units = "metric" if metric else "imperial"
         self.num_hours = 5
@@ -15,7 +15,7 @@ class WeatherService:
         self.lat, self.lon = self.get_coords(location)
 
     def get_icon(self, icon_id):
-        local_path = f"views/html/assets/{icon_id}.png"
+        local_path = f"views/html/assets/icon/{icon_id}.png"
         if not exists(local_path):
             return f"https://openweathermap.org/img/wnicon_id4x.png"
 
