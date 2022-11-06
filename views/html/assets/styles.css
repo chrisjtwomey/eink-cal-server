@@ -49,12 +49,21 @@ h3.numcircle {
   border-radius: 12vw;
 }
 
-h4.numcircle {
+h4.numcircle, #icon-container.numcircle {
   font-size: 5vw;
   font-weight: 600;
-  line-height: 14vw;
+  line-height: 10vh;
+  height: 10vh;
   width: 14vw;
   border-radius: 7vw;
+}
+
+#icon-container.numcircle img {
+  width: 90%;
+  position: absolute;
+  left:5%;
+  bottom:10%;
+  filter: invert(1);
 }
 
 .numcircle {
@@ -75,6 +84,12 @@ h4.numcircle {
 #top-banner #temp {
   position: absolute;
   top: 20vh;
+  right: 2vw;
+}
+
+#top-banner #icon-container {
+  position: absolute;
+  top: 32vh;
   right: 2vw;
 }
 

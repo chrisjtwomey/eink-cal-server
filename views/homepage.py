@@ -70,6 +70,9 @@ class Homepage:
                                 _t=str(forecasts[0]["temp"]["real"]) + current["temp"]["unit"],
                             )
 
+                        with a.div(id="icon-container", klass="numcircle"):
+                            a.img(src=current["icon"])
+
                 with a.div(id="map-container"):
                     a.img(src=map_url, id="map")
 
