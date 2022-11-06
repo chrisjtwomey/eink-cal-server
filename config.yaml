@@ -1,0 +1,20 @@
+---
+debug: false
+openweathermap:
+  apikey: XXXX
+google:
+  apikey: XXXX
+  staticmaps_mapid: XXXX
+location: Dublin
+server:
+  enabled: true
+  aliveSeconds: 60
+  maxServes: 1
+image:
+  width: 825
+  height: 1200
+mqtt:
+  enabled: true
+  host: localhost
+  port: 1883
+  topic: mqtt/eink-cal-client

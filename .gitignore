@@ -85,8 +85,8 @@ workspace.code-workspace
 
 # gen'd files
 *.html
-views/png/*.png
-*.bmp
+views/*.png
+views/*.bmp
 
 # mac junk
 .DS_Store

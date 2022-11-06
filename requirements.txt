@@ -2,10 +2,11 @@ selenium
 webdriver_manager
 airium
 packaging
+PyYAML==6.0
+googlemaps==4.6.0
 Flask==2.2.2
 Pillow==9.2.0
 protobuf==4.21.6
-pytz==2022.1
 requests==2.28.1
 Werkzeug==2.2.2
 paho-mqtt==1.6.1

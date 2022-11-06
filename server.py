@@ -4,212 +4,212 @@
 import os
 import io
 import sys
-import json
+import yaml
 import time
 import threading
 import datetime as dt
 import logging.config
 import paho.mqtt.client as mqtt
-from flask import Flask, send_file, request, abort
-from werkzeug.serving import make_server
-from pytz import timezone
-from views.homepage import Homepage
+from utils import get_prop, get_prop_by_keys
+from views.calendar import CalendarPage
+from google.api import GoogleAPIService
 from weather.weather import WeatherService
-from google_api.staticmap import StaticMapService
-
-app = Flask(__name__)
-has_served = False
-client_user_agent = "tinys3"
-use_user_agent = False
+from werkzeug.serving import make_server
+from flask import Flask, send_file, abort
 
 cwd = os.path.dirname(os.path.realpath(__file__))
+log = None
 
-# Create and configure logger
-logging.config.fileConfig(os.path.join(cwd, "logging.dev.ini"))
-log = logging.getLogger("server")
-
-class ServerThread(threading.Thread):
-    def __init__(self, app, user_agent):
-        threading.Thread.__init__(self)
-        self.server = make_server("0.0.0.0", 8080, app)
-        self.ctx = app.app_context()
-        self.ctx.push()
-        self.serve_user_agent = user_agent
-        self.has_served = False
-
-    def run(self):
-        log.info("starting http server")
-        self.server.serve_forever()
-
-    def shutdown(self, timeout=60):
-        log.info(f"stopping http server in {timeout} seconds")
-        time.sleep(timeout)
-        self.server.shutdown()
-
-
-@app.route("/homepage.bmp")
-def serve_cal_bmp():
-    global has_served, client_user_agent
-    """
-    Returns the calendar image directly through send_file
-    """
-    user_agent = request.headers.get("User-Agent")
-    if user_agent is not None and user_agent == client_user_agent:
-        has_served = True
-
-    bmp_path = os.path.join(cwd, "views/bmp/homepage.bmp")
-
-    if not os.path.exists(bmp_path):
-        log.error(f"{bmp_path}: no such file exists")
-        abort(404)
-
-    f = open(bmp_path, "rb")
-    stream = io.BytesIO(f.read())
-
-    return send_file(
-        stream, mimetype="image/bmp", as_attachment=True, download_name=f"homepage.bmp"
-    )
-
-@app.route("/homepage.png")
-def serve_cal_png():
-    global has_served, client_user_agent, use_user_agent
-    """
-    Returns the calendar image directly through send_file
-    """
-    user_agent = request.headers.get("User-Agent")
-    if user_agent is not None and user_agent == client_user_agent:
-        has_served = True
-
-    png_path = os.path.join(cwd, "views/png/homepage.png")
-
-    if not os.path.exists(png_path):
-        log.error(f"{png_path}: no such file exists")
-        abort(404)
-
-    f = open(png_path, "rb")
-    stream = io.BytesIO(f.read())
-
-    has_served = True
-
-    return send_file(
-        stream, mimetype="image/png", as_attachment=True, download_name=f"homepage.png"
-    )
+app = Flask(__name__)
+# number of times served
+server_num_serves = 0
+server_max_serves = 1
 
 
 def main():
-    configFile = open(os.path.join(cwd, "config.json"))
-    config = json.load(configFile)
+    global log, server_max_serves
 
-    displayTZ = timezone(
-        config["timezone"]
-    ) 
-    imageWidth = config["imageWidth"] 
-    imageHeight = config["imageHeight"]
-    client_user_agent = config["clientUserAgent"]
-    use_user_agent = config["useUserAgent"]
-    use_server = config["useServer"]
-    max_wait_serve_seconds = config["maxWaitServerMinutes"] * 60
+    config_file = open(os.path.join(cwd, "config.yaml"))
+    config = yaml.safe_load(config_file)
 
-    location = config["location"].strip().replace(" ", "")
-    weather_apikey = config["weather"]["apikey"]
+    debug = get_prop(config, "debug", default=False)
+    # Create and configure logger
+    log_ini_path = os.path.join(cwd, "logging.ini")
+    if debug:
+        logging.config.fileConfig(os.path.join(cwd, "logging.dev.ini"))
+    logging.config.fileConfig(log_ini_path)
+    log = logging.getLogger("server")
+
+    google_apikey = get_prop_by_keys(config, "google", "apikey", required=True)
+    owm_apikey = get_prop_by_keys(config, "openweathermap", "apikey", required=True)
+
+    staticmaps_mapid = get_prop_by_keys(
+        config, "google", "staticmaps_mapid", required=True
+    )
+
+    location = get_prop(config, "location", required=True).strip().replace(" ", "")
+
+    server_enabled = get_prop_by_keys(config, "server", "enabled", default=True)
+    server_alive_seconds = get_prop_by_keys(
+        config, "server", "aliveSeconds", default=60
+    )
+    server_max_serves = get_prop_by_keys(config, "server", "maxServes", default=1)
+
+    image_width = get_prop_by_keys(config, "image", "width", default=825)
+    image_height = get_prop_by_keys(config, "image", "height", default=1200)
+
+    mqtt_enabled = get_prop_by_keys(config, "mqtt", "enabled", default=False)
+    mqtt_host = get_prop_by_keys(config, "mqtt", "host", default="localhost")
+    mqtt_port = get_prop_by_keys(config, "mqtt", "port", default=1883)
+    mqtt_topic = get_prop_by_keys(
+        config, "mqtt", "topic", default="mqtt/eink-cal-client"
+    )
+
+    gapi = GoogleAPIService(google_apikey)
+    map_url = gapi.get_static_map_url(staticmaps_mapid, location)
 
     weather_svc = WeatherService(
-        weather_apikey, 
-        location, 
+        owm_apikey,
+        location,
         debug=False,
     )
-
-    maps_apikey = config["maps"]["apikey"]
-    maps_mapid = config["maps"]["map_id"]
-
-    map_svc = StaticMapService(
-        maps_apikey,
-        maps_mapid,
-    )
-
-    log.info("Starting daily calendar update")
+    current_forecast = weather_svc.current_forecast()
+    hourly_forecasts = weather_svc.three_hour_daily_forecast()
 
     try:
-        homepage = Homepage(imageWidth, imageHeight)
-        homepage.generate(
-            weather_svc,
-            map_svc,
-            location
+        # generate page images
+        page = CalendarPage(image_width, image_height)
+        page.template(
+            map_url=map_url,
+            current_forecast=current_forecast,
+            hourly_forecasts=hourly_forecasts,
         )
-        homepage.save()
-
+        page.save()
     except Exception as e:
         raise e
-        # log.error(e)
 
-    log.info("Completed daily calendar update")
-
-    if not use_server:
+    # bail early if http server is not enabled
+    if not server_enabled:
         sys.exit(0)
 
     # set up listener for client logs
+    mqtt_client = None
+    if mqtt_enabled:
+        mqtt_client = get_client_mqtt_logging(mqtt_host, mqtt_port, mqtt_topic)
+
+    # setup http server
+    http_server = ServerThread(app)
+    http_server.start()
+
+    enable_wait = server_alive_seconds > 0
+    enable_max_serves = server_max_serves > 0
+
+    if enable_wait:
+        log.info(f"Serving images for {server_alive_seconds} seconds before shutdown")
+    if enable_max_serves:
+        log.info(f"Serving images for max {server_max_serves} times before shutdown")
+
+    start_wait_dt = dt.datetime.now()
+    diff = dt.datetime.now() - start_wait_dt
+    while (enable_max_serves and server_num_serves < server_max_serves) and (
+        enable_wait and diff.seconds < server_alive_seconds
+    ):
+        time.sleep(1)
+        diff = dt.datetime.now() - start_wait_dt
+
+    http_server.shutdown(timeout=10)
+
+    if mqtt_client:
+        mqtt_client.loop_stop()
+        mqtt_client.disconnect()
+
+    log.info(f"Exiting")
+    sys.exit(0)
+
+
+def get_client_mqtt_logging(host, port, topic):
     mqtt_client = mqtt.Client("eink-cal-server")
+    client_log = logging.getLogger("client")
+
     def on_connect(client, userdata, flags, rc):
         if rc != 0:
-            log.error("Connection calendar client logging broker failed")
-        
-        log.info("Connected to calendar client logging broker")
+            log.error("Connection to client logging broker failed")
+
+        log.info("Connected to client logging broker")
 
     def on_disconnect(client, userdata, rc):
         if rc != 0:
             log.error("Unexpected broker disconnection")
 
-        log.info("Disconnected from calendar client logging broker")
+        log.info("Disconnected from client logging broker")
 
-    clientLog = logging.getLogger("client")
     def on_message(client, userdata, message):
         if message.retain:
             # ignore stale messages
             return
-            
-        clientLog.info(message.payload.decode())
 
-    mqtt_client.on_connect=on_connect
-    mqtt_client.on_disconnect=on_disconnect
-    mqtt_client.on_message=on_message
+        client_log.info(message.payload.decode())
+
+    mqtt_client.on_connect = on_connect
+    mqtt_client.on_disconnect = on_disconnect
+    mqtt_client.on_message = on_message
     try:
-        mqtt_client.connect(
-            config["mqtt"]["host"], 
-            config["mqtt"]["port"], 
-            60
-        )
+        mqtt_client.connect(host, port, 60)
+        mqtt_client.subscribe(topic)
+        mqtt_client.loop_start()
+
+        return mqtt_client
     except Exception as e:
-        log.error(e)
-        
-    mqtt_client.subscribe(config["mqtt"]["topic"])
-    mqtt_client.loop_start()
+        log.error(f"Connection to client logging broker failed: {e}")
 
-    log.info("Serving calendar image for esp32 client")
+    return None
 
-    http_server = ServerThread(app, client_user_agent)
-    http_server.start()
 
-    log.info(
-        "Waiting {} seconds to serve esp32 client before shutdown".format(
-            max_wait_serve_seconds
-        )
+class ServerThread(threading.Thread):
+    def __init__(self, app, max_serves=1):
+        threading.Thread.__init__(self)
+        self.server = make_server("0.0.0.0", 8080, app)
+        self.ctx = app.app_context()
+        self.ctx.push()
+        self.max_serves = max_serves
+
+    def run(self):
+        log.info("Starting http server")
+        self.server.serve_forever()
+
+    def shutdown(self, timeout=60):
+        log.info(f"Stopping http server in {timeout} seconds")
+        time.sleep(timeout)
+        self.server.shutdown()
+
+
+@app.route("/calendar.png")
+def serve_cal_png():
+    global server_num_serves, server_max_serves
+    """
+    Returns the calendar image directly through send_file
+    """
+
+    path = os.path.join(cwd, "views/calendar.png")
+
+    if not os.path.exists(path):
+        log.error(f"{path}: no such file exists")
+        abort(404)
+
+    f = open(path, "rb")
+    stream = io.BytesIO(f.read())
+
+    # incr number of times served
+    server_num_serves += 1
+    if server_max_serves > 0:
+        log.info(f"Served {server_num_serves}/{server_max_serves} times")
+
+    return send_file(
+        stream,
+        mimetype="image/png",
+        as_attachment=True,
+        download_name=os.path.basename(path),
     )
-    start_wait_dt = dt.datetime.now(displayTZ)
-    diff = dt.datetime.now(displayTZ) - start_wait_dt
-    while not has_served and diff.seconds < max_wait_serve_seconds:
-        time.sleep(1)
-        diff = dt.datetime.now(displayTZ) - start_wait_dt
-    http_server.shutdown(timeout=10)
-
-    if not has_served:
-        log.error("Timeout waiting to server esp32 client, exiting")
-        sys.exit(1)
-
-    mqtt_client.loop_stop()
-    mqtt_client.disconnect()
-
-    log.info("Served esp32 client, shutting down")
-    sys.exit(0)
 
 
 if __name__ == "__main__":
