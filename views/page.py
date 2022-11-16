@@ -32,8 +32,7 @@ class Page:
 
     def save(self):
         cwd = os.path.dirname(os.path.realpath(__file__))
-        html_fp = os.path.join("views", "html", self.name + ".html")
-        abs_html_fp = "file://" + os.path.join(cwd, "html", self.name + ".html")
+        html_fp = os.path.join(cwd, "html", self.name + ".html")
         png_fp = os.path.join(cwd, self.name + ".png")
 
         with open(html_fp, "wb") as f:
@@ -41,7 +40,7 @@ class Page:
             f.close()
 
         driver = self._get_chromedriver()
-        driver.get(abs_html_fp)
+        driver.get("file://" + html_fp)
         sleep(1)
         driver.get_screenshot_as_file(png_fp)
         driver.quit()

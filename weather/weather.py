@@ -1,3 +1,4 @@
+import os
 import json
 import requests
 from os.path import exists, abspath
@@ -16,8 +17,10 @@ class WeatherService:
         self.debug = debug
 
     def get_icon(self, icon_id):
-        local_path = f"views/html/icon/{icon_id}.png"
+        cwd = os.path.dirname(os.path.realpath(__file__))
+        local_path = os.path.join(cwd, "..", f"views/html/icon/{icon_id}.png")
         if not exists(local_path):
+            print(local_path)
             return f"https://openweathermap.org/img/wnicon_id4x.png"
 
         return abspath(local_path)
