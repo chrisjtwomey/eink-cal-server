@@ -47,6 +47,7 @@ class Page:
         driver.quit()
 
         img = Image.open(png_fp)
+        img = img.convert("P", palette=Image.ADAPTIVE, colors=256)
         img.save(png_fp, format="png", optimize=True, quality=25)
 
         self.log.info("Screenshot captured and saved to file.")

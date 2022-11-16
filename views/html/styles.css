@@ -193,8 +193,18 @@ h4.numcircle, #icon-container.numcircle {
   margin: 0 auto !important;
 }
 
-#test {
-  height: 300px;
-  max-width: 100%;
-  margin: 0 auto;
+.overlayed-chart {
+  position: absolute;
+}
+
+.yAxisviz0, .yAxisviz1 {
+  display: none !important;
+}
+
+#viz0 {
+  z-index: -1;
+}
+
+#viz1 {
+  z-index: 1;
 }

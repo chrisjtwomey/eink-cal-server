@@ -18,6 +18,27 @@ class CalendarPage(Page):
         current_forecast = kwargs["current_forecast"]
         hourly_forecasts = kwargs["hourly_forecasts"]
 
+        hours = []
+        temps = []
+        precip_percents = []
+        for forecast in hourly_forecasts:
+            hour = ""
+            try:
+                hour = forecast["dt"].strftime(
+                    "%-I"
+                )
+            except ValueError as ve:
+                # platform-specific formatting error
+                #self.log.warning(str(ve))
+                hour = forecast["dt"].strftime("%I")
+
+            if hour in hours and hour == "12":
+                hour = "00"
+
+            hours.append(hour)
+            temps.append(forecast["temp"]["real"])
+            precip_percents.append(forecast["precip_percentage"])
+
         a = self.airium
         now = dt.datetime.now()
         self.log.info("Time synchronised to %s", now)
@@ -33,6 +54,7 @@ class CalendarPage(Page):
                 )
                 a.title(_t="Calendar")
                 a.link(rel="stylesheet", href="styles.css")
+                a.script(src="https://unpkg.com/rough-viz@1.0.6")
 
             with a.body():
                 with a.div(klass="bg-container"):
@@ -96,33 +118,53 @@ class CalendarPage(Page):
                                                     klass="hourly-forecast-icon fc-icon"
                                                 ):
                                                     a.img(src=forecast["icon"])
-                                    with a.tr():
-                                        for forecast in hourly_forecasts:
-                                            with a.td():
-                                                with a.div(klass="fc-icon-stat"):
-                                                    with a.div(klass="fc-icon"):
-                                                        a.img(
-                                                            src="icon/thermometer.png"
-                                                        )
-                                                    with a.div(klass="fc-stat"):
-                                                        a.p(
-                                                            _t=str(
-                                                                forecast["temp"]["real"]
-                                                            )
-                                                            + forecast["temp"]["unit"]
-                                                        )
-                                    with a.tr():
-                                        for forecast in hourly_forecasts:
-                                            with a.td():
-                                                with a.div(klass="fc-icon-stat"):
-                                                    with a.div(klass="fc-icon"):
-                                                        a.img(src="icon/precip.png")
-                                                    with a.div(klass="fc-stat"):
-                                                        a.p(
-                                                            _t=str(
-                                                                forecast[
-                                                                    "precip_percentage"
-                                                                ]
-                                                            )
-                                                            + "%"
-                                                        )
+
+                    a.div(id="viz0", klass="overlayed-chart")
+                    a.div(id="viz1", klass="overlayed-chart")
+
+
+                with a.script():
+                    a("""
+                        new roughViz.Bar({{
+                            element: '#viz0',
+                            data: {{
+                                labels: {0},
+                                values: {1}
+                            }},
+                            padding: 0,
+                            margin: {{
+                                left: 50, 
+                                top: 50, 
+                                right: 0, 
+                                bottom: 0
+                            }}, 
+                            width: window.innerWidth - 50,
+                            roughness: 4,
+                            height: 330,
+                            color: 'black',
+                            bowing: 0.2,
+                        }});
+
+                        new roughViz.Line({{
+                            element: '#viz1',
+                            data: {{
+                                temp: {2},
+                            }},
+                            x: {0},
+                            circle: true,
+                            circleRoughness: 4,
+                            legend: false,
+                            height: 330,
+                            margin: {{
+                                left: 50, 
+                                top: 50, 
+                                right: 20, 
+                                bottom: 0
+                            }}, 
+                            width: window.innerWidth - 50,
+                            roughness: 0.5,
+                            height: 330,
+                            colors: ['black'],
+                            strokeWidth: 3,
+                        }});
+                    """.format(hours, precip_percents, temps))

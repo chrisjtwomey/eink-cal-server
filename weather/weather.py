@@ -101,7 +101,7 @@ class WeatherService:
                     "humidity_percentage": entry["main"]["humidity"],
                     "pressure_hpa": entry["main"]["pressure"],
                     "clouds_percentage": entry["clouds"]["all"],
-                    "precip_percentage": round(entry["pop"]),
+                    "precip_percentage": round(entry["pop"] * 100),
                 }
             )
 
