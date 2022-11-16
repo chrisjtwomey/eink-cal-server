@@ -20,7 +20,6 @@ class WeatherService:
         cwd = os.path.dirname(os.path.realpath(__file__))
         local_path = os.path.join(cwd, "..", f"views/html/icon/{icon_id}.png")
         if not exists(local_path):
-            print(local_path)
             return f"https://openweathermap.org/img/wnicon_id4x.png"
 
         return abspath(local_path)

@@ -117,8 +117,8 @@ class CalendarPage(Page):
                                                 ):
                                                     a.img(src=forecast["icon"])
 
-                    a.div(id="viz0", klass="overlayed-chart")
-                    a.div(id="viz1", klass="overlayed-chart")
+                        a.div(id="viz0", klass="overlayed-chart")
+                        a.div(id="viz1", klass="overlayed-chart")
 
 
                 with a.script():
@@ -131,14 +131,14 @@ class CalendarPage(Page):
                             }},
                             padding: 0,
                             margin: {{
-                                left: 50, 
-                                top: 50, 
+                                left: 25, 
+                                top: 10, 
                                 right: 0, 
-                                bottom: 0
+                                bottom: 50
                             }}, 
                             width: window.innerWidth - 50,
                             roughness: 4,
-                            height: 330,
+                            height: 300,
                             color: 'black',
                             bowing: 0.2,
                         }});
@@ -152,16 +152,15 @@ class CalendarPage(Page):
                             circle: true,
                             circleRoughness: 4,
                             legend: false,
-                            height: 330,
+                            height: 300,
                             margin: {{
-                                left: 50, 
-                                top: 50, 
+                                left: 25, 
+                                top: 10, 
                                 right: 20, 
-                                bottom: 0
+                                bottom: 50
                             }}, 
                             width: window.innerWidth - 50,
                             roughness: 0.5,
-                            height: 330,
                             colors: ['black'],
                             strokeWidth: 3,
                         }});

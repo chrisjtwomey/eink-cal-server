@@ -197,7 +197,7 @@ h4.numcircle, #icon-container.numcircle {
   position: absolute;
 }
 
-.yAxisviz0, .yAxisviz1 {
+.xAxisviz0, .yAxisviz0, .xAxisviz1, .yAxisviz1 {
   display: none !important;
 }
 
