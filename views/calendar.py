@@ -32,9 +32,7 @@ class CalendarPage(Page):
                 #self.log.warning(str(ve))
                 hour = forecast["dt"].strftime("%I")
 
-            if hour in hours and hour == "12":
-                hour = "00"
-
+            hour = hour + forecast["dt"].strftime("%p").lower()
             hours.append(hour)
             temps.append(forecast["temp"]["real"])
             precip_percents.append(forecast["precip_percentage"])
