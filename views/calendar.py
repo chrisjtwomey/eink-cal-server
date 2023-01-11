@@ -52,7 +52,10 @@ class CalendarPage(Page):
                 )
                 a.title(_t="Calendar")
                 a.link(rel="stylesheet", href="styles.css")
-                a.script(src="https://unpkg.com/rough-viz@1.0.6")
+                a.script(type="text/javascript", src="https://unpkg.com/chart.js@2.8.0")
+                a.script(type="text/javascript", src="https://unpkg.com/roughjs@3.1.0/dist/rough.js")
+                a.script(type="text/javascript", src="https://unpkg.com/chartjs-plugin-datalabels@1.0.0")
+                a.script(type="text/javascript", src="https://unpkg.com/chartjs-plugin-rough@latest/dist/chartjs-plugin-rough.min.js")
 
             with a.body():
                 with a.div(klass="bg-container"):
@@ -117,51 +120,87 @@ class CalendarPage(Page):
                                                 ):
                                                     a.img(src=forecast["icon"])
 
-                        a.div(id="viz0", klass="overlayed-chart")
-                        a.div(id="viz1", klass="overlayed-chart")
-
+                        a.canvas(id="rain-temp-chart", height="130")
 
                 with a.script():
                     a("""
-                        new roughViz.Bar({{
-                            element: '#viz0',
+                        Chart.defaults.scale.gridLines.display = false;
+                        Chart.defaults.scale.gridLines.color = "#000";
+                        Chart.defaults.scale.gridLines.lineWidth = 2;
+                        Chart.defaults.scale.ticks.display = false;
+                        Chart.defaults.scale.ticks.max = 100;
+                        Chart.defaults.global.legend.display = false;
+                        Chart.defaults.global.defaultFontColor = "#000";
+                        Chart.defaults.global.animation.duration = 0;
+                        var ctx = document.getElementById('rain-temp-chart').getContext('2d');
+                        var chart = new Chart(ctx, {{
+                            type: 'bar',
                             data: {{
                                 labels: {0},
-                                values: {1}
-                            }},
-                            padding: 0,
-                            margin: {{
-                                left: 25, 
-                                top: 10, 
-                                right: 0, 
-                                bottom: 50
-                            }}, 
-                            width: window.innerWidth - 50,
-                            roughness: 4,
-                            height: 300,
-                            color: 'black',
-                            bowing: 0.2,
-                        }});
+                                datasets: [{{
+                                    data: {1},
+                                    backgroundColor: 'rgb(0, 0, 0)',
+                                    borderColor: 'rgb(0, 0, 0)',
+                                    datalabels: {{
+                                        display: 'auto',
+                                        align: 'top',
+                                        anchor: 'end',
+                                        clamp: 'true',
+                                        backgroundColor: "#FFF",
+                                        borderRadius: 4,
+                                        font: {{
+                                            family: 'Merienda-Regular',
+                                            size: 32
+                                        }},
+                                        display: function(context) {{
+                                            var index = context.dataIndex;
+                                            var value = context.dataset.data[index];
 
-                        new roughViz.Line({{
-                            element: '#viz1',
-                            data: {{
-                                temp: {2},
+                                            return value > 0;
+                                        }},
+                                        formatter: function(value, context) {{
+                                            return value + "%";
+                                        }}
+                                    }},
+                                    borderWidth: 3,
+                                    stack: 'combined',
+                                    rough: {{
+                                        roughness: 4,
+                                        bowing: 0.2,
+                                        fillStyle: 'zigzag',
+                                        fillWeight: 1.5,
+                                        hachureAngle: 45,
+                                        hachureGap: 12
+                                    }}
+                                }}, {{
+                                    data: {2},
+                                    backgroundColor: 'rgba(0, 0, 0, 0)',
+                                    borderColor: 'rgb(0, 0, 0)',
+                                    datalabels: {{
+                                        display: 'auto',
+                                        align: 'top',
+                                        anchor: 'start',
+                                        offset: 12,
+                                        backgroundColor: "#FFF",
+                                        borderRadius: 4,
+                                        font: {{
+                                            family: 'Merienda-Regular',
+                                            size: 32
+                                        }},
+                                        formatter: function(value, context) {{
+                                            return value + "°C";
+                                        }}
+                                    }},
+                                    rough: {{
+                                        roughness: 1,
+                                        bowing: 0.1,
+                                        fillWeight: 1.5,
+                                        hachureAngle: 45,
+                                        hachureGap: 12
+                                    }},
+                                    type: 'line'
+                                }}]
                             }},
-                            x: {0},
-                            circle: true,
-                            circleRoughness: 4,
-                            legend: false,
-                            height: 300,
-                            margin: {{
-                                left: 25, 
-                                top: 10, 
-                                right: 20, 
-                                bottom: 50
-                            }}, 
-                            width: window.innerWidth - 50,
-                            roughness: 0.5,
-                            colors: ['black'],
-                            strokeWidth: 3,
+                            plugins: [ChartDataLabels, ChartRough]
                         }});
                     """.format(hours, precip_percents, temps))
